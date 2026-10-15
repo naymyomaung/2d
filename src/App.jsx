@@ -472,24 +472,27 @@ function App() {
                   <button type="button" disabled={isFuture} key={isoDate} onClick={() => setCalendarSelectedDate(isoDate)}
                     className={`calendar-day ${calendarSelectedDate === isoDate ? 'selected' : ''} ${isoDate === marketDate ? 'is-today' : ''} ${isFuture ? 'future' : ''}`}>
                     <span className="calendar-day-number">{dayNumber}</span>
-                    {(midday || closing) && <span className="calendar-day-results"><span>{midday ? `12 ${midday}` : '12 —'}</span><span>{closing ? `16:30 ${closing}` : '16:30 —'}</span></span>}
+                    {(midday || closing) && <span className="calendar-day-results">
+                      <span className="calendar-result-line midday-line"><span className="calendar-result-time">12:00</span><strong className="calendar-result-value">{midday || '—'}</strong></span>
+                      <span className="calendar-result-line closing-line"><span className="calendar-result-time">16:30</span><strong className="calendar-result-value">{closing || '—'}</strong></span>
+                    </span>}
                   </button>
                 )
               })}
             </div>
-            <div className="calendar-legend"><span><i className="legend-midday" />12:01 PM</span><span><i className="legend-closing" />16:30</span><span>Published results from API</span></div>
+            <div className="calendar-legend"><span><i className="legend-midday" />12:00</span><span><i className="legend-closing" />16:30</span><span>Published results from API</span></div>
           </div>
           <div className="calendar-detail-panel">
             <div className="section-kicker">SELECTED DATE</div>
             <h2>{dateLabel(calendarSelectedDate)}</h2>
-            <p className="history-subtitle">Daily results for 12:01 and 16:30</p>
+            <p className="history-subtitle">Daily results for 12:00 and 16:30</p>
             {calendarLoading ? <div className="calendar-empty-detail">Loading results…</div> : calendarError
               ? <div className="calendar-empty-detail error-text">{calendarError}</div>
               : <div className="calendar-result-list">
                   {primaryCalendarResults.map((result, index) => {
                     const session = sessions[index === 0 ? 1 : 3]
-                    return <article className="calendar-result-card" key={session.time}>
-                      <div><span className="session-time-icon is-published"><Clock3 size={15} /></span><div>                      <strong>{session.time}{session.time === '12:01' ? ' PM' : ''}</strong><small>{session.label} session</small></div></div>
+                    return <article className={`calendar-result-card ${index === 0 ? 'midday-result' : 'closing-result'}`} key={session.time}>
+                      <div><span className="session-time-icon is-published"><Clock3 size={15} /></span><div><strong className="calendar-session-time">{session.time === '12:01' ? '12:00' : session.time}</strong><small>{session.label} session</small></div></div>
                       {result?.twod && result.twod !== '--'
                         ? <><span className="calendar-result-number">{result.twod}</span><div className="calendar-result-meta"><span>SET <strong>{displayNumber(result.set)}</strong></span><span>VALUE <strong>{displayNumber(result.value)}</strong></span></div></>
                         : <span className="pending-badge"><span />{calendarSelectedDate > (marketDate || '') ? 'Upcoming' : 'No result'}</span>}
